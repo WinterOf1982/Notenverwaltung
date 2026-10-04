@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Tests: berechnung.js</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    .ok { color: #1a7f4b; } .fehler { color: #b3261e; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Tests: berechnung.js</h1>
+  <p id="zusammenfassung"></p>
+  <ul id="ergebnis"></ul>
+
+  <script type="module">
+    import { runde, istGueltigeNote, gewichteterMittelwert, formatiereNote }
+      from '../js/logic/berechnung.js';
+
+    const liste = document.getElementById('ergebnis');
+    let fehlerAnzahl = 0, gesamt = 0;
+
+    function gleich(ist, soll) {
+      if (ist !== soll) throw new Error(`erwartet ${soll}, erhalten ${ist}`);
+    }
+    function test(name, fn) {
+      gesamt++;
+      const li = document.createElement('li');
+      try { fn(); li.className = 'ok'; li.textContent = `✔ ${name}`; }
+      catch (e) { fehlerAnzahl++; li.className = 'fehler'; li.textContent = `✘ ${name}: ${e.message}`; }
+      liste.append(li);
+    }
+
+    test('runde: 2,25 -> 2,3', () => gleich(runde(2.25, 1), 2.3));
+    test('runde: 2,349 -> 2,3', () => gleich(runde(2.349, 1), 2.3));
+    test('istGueltigeNote: 1 und 6 gültig', () => { gleich(istGueltigeNote(1), true); gleich(istGueltigeNote(6), true); });
+    test('istGueltigeNote: 0, 7, NaN, null ungültig', () => {
+      gleich(istGueltigeNote(0), false); gleich(istGueltigeNote(7), false);
+      gleich(istGueltigeNote(NaN), false); gleich(istGueltigeNote(null), false);
+    });
+    test('gewichteterMittelwert: (1*1 + 4*2) / 3 = 3', () =>
+      gleich(gewichteterMittelwert([{ wert: 1, gewicht: 1 }, { wert: 4, gewicht: 2 }]), 3));
+    test('gewichteterMittelwert: leere Liste -> null', () => gleich(gewichteterMittelwert([]), null));
+    test('gewichteterMittelwert: ungültige Einträge werden ignoriert', () =>
+      gleich(gewichteterMittelwert([{ wert: null, gewicht: 1 }, { wert: 2, gewicht: 0 }, { wert: 3, gewicht: 1 }]), 3));
+    test('formatiereNote: Dezimalkomma', () => gleich(formatiereNote(2.25), '2,3'));
+    test('formatiereNote: kein Wert -> Gedankenstrich', () => gleich(formatiereNote(null), '–'));
+
+    document.getElementById('zusammenfassung').textContent =
+      fehlerAnzahl === 0 ? `Alle ${gesamt} Tests bestanden.` : `${fehlerAnzahl} von ${gesamt} Tests fehlgeschlagen.`;
+  </script>
+</body>
+</html>

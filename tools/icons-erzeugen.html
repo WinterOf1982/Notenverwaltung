@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Icons erzeugen</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    .icon { display: inline-block; margin: 0 24px 24px 0; text-align: center; }
+    canvas { width: 128px; height: 128px; border: 1px solid #ccc; background: #eee; }
+    a { display: block; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>PWA-Icons erzeugen</h1>
+  <p>Lade die drei Dateien herunter und speichere sie im Ordner <code>icons/</code>.</p>
+  <div id="ausgabe"></div>
+
+  <script>
+    const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <rect width="512" height="512" fill="#0b5cab"/>
+      <rect x="136" y="96" width="240" height="320" rx="24" fill="#fff"/>
+      <rect x="176" y="160" width="160" height="20" rx="10" fill="#9db9d9"/>
+      <rect x="176" y="212" width="160" height="20" rx="10" fill="#9db9d9"/>
+      <rect x="176" y="264" width="100" height="20" rx="10" fill="#9db9d9"/>
+      <path d="M200 350l36 36 76-84" fill="none" stroke="#1a9a55" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    const varianten = [
+      { datei: 'icon-192.png', groesse: 192, rund: true },
+      { datei: 'icon-512.png', groesse: 512, rund: true },
+      { datei: 'icon-maskable-512.png', groesse: 512, rund: false }
+    ];
+
+    const bild = new Image();
+    bild.onload = () => {
+      for (const v of varianten) {
+        const leinwand = document.createElement('canvas');
+        leinwand.width = leinwand.height = v.groesse;
+        const ctx = leinwand.getContext('2d');
+        if (v.rund) {
+          ctx.beginPath();
+          ctx.roundRect(0, 0, v.groesse, v.groesse, v.groesse * 0.18);
+          ctx.clip();
+        }
+        ctx.drawImage(bild, 0, 0, v.groesse, v.groesse);
+
+        const box = document.createElement('div');
+        box.className = 'icon';
+        const link = document.createElement('a');
+        link.textContent = `${v.datei} herunterladen`;
+        link.download = v.datei;
+        leinwand.toBlob((blob) => { link.href = URL.createObjectURL(blob); });
+        box.append(leinwand, link);
+        document.getElementById('ausgabe').append(box);
+      }
+    };
+    bild.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(SVG);
+  </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Notenverwaltung – KLA Bremerhaven</title>
+  <meta name="description" content="Lokale Notenverwaltung. Alle Daten bleiben auf diesem Gerät.">
+  <meta name="theme-color" content="#0b5cab">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="kopfzeile">
+    <div class="kopfzeile__titel">
+      <h1>Notenverwaltung</h1>
+      <p>KLA Bremerhaven</p>
+    </div>
+    <div class="kopfzeile__aktionen">
+      <span id="verbindungsstatus" class="badge" role="status">Online</span>
+      <button id="btn-installieren" class="btn btn--hell" type="button" hidden>App installieren</button>
+    </div>
+  </header>
+
+  <div id="meldung" class="meldung" role="status" aria-live="polite" hidden></div>
+
+  <main id="inhalt">
+    <noscript><p class="karte">Diese App benötigt JavaScript.</p></noscript>
+
+    <section aria-labelledby="h-start">
+      <h2 id="h-start">Startseite</h2>
+      <p class="leise">Alle Daten bleiben ausschließlich auf diesem Gerät gespeichert.</p>
+    </section>
+<section class="karte" aria-labelledby="h-schuljahre">
+  <h2 id="h-schuljahre">Schuljahre</h2>
+  <p id="schuljahr-hinweis" class="leise" hidden>
+    Bitte lege zuerst ein Schuljahr an. Beim ersten Start werden Bundesland
+    und erster Schultag benötigt.
+  </p>
+
+  <form id="schuljahr-form" class="formular">
+    <label>
+      Bundesland
+      <select name="bundeslandCode" required>
+        <option value="DE-BW">Baden-Württemberg</option>
+        <option value="DE-BY">Bayern</option>
+        <option value="DE-BE">Berlin</option>
+        <option value="DE-BB">Brandenburg</option>
+        <option value="DE-HB" selected>Bremen</option>
+        <option value="DE-HH">Hamburg</option>
+        <option value="DE-HE">Hessen</option>
+        <option value="DE-MV">Mecklenburg-Vorpommern</option>
+        <option value="DE-NI">Niedersachsen</option>
+        <option value="DE-NW">Nordrhein-Westfalen</option>
+        <option value="DE-RP">Rheinland-Pfalz</option>
+        <option value="DE-SL">Saarland</option>
+        <option value="DE-SN">Sachsen</option>
+        <option value="DE-ST">Sachsen-Anhalt</option>
+        <option value="DE-SH">Schleswig-Holstein</option>
+        <option value="DE-TH">Thüringen</option>
+      </select>
+    </label>
+    <label>
+      Erster Schultag
+      <input name="ersterSchultag" type="date" required>
+    </label>
+    <button class="btn" type="submit">Schuljahr anlegen</button>
+  </form>
+
+  <div id="schuljahr-meldung" class="meldung" role="status"
+       aria-live="polite" hidden></div>
+  <div id="schuljahr-liste"></div>
+</section>
+
+<section id="kurs-bereich" class="karte" aria-labelledby="h-kurse" hidden>
+  <h2 id="h-kurse">Kurse und Halbjahresgrenzen</h2>
+
+  <form id="kurs-form" class="formular">
+    <label>
+      Schuljahr
+      <select name="schuljahrId" required></select>
+    </label>
+    <label>
+      Kursname
+      <input name="kursname" type="text" required maxlength="100"
+             placeholder="Zum Beispiel: Fachkurs A">
+    </label>
+    <button class="btn" type="submit">Kurs anlegen</button>
+  </form>
+
+  <div id="kursliste"></div>
+</section>
+
+    <section class="kacheln" aria-label="Bereiche">
+      <button class="kachel" type="button" disabled>
+        <span class="kachel__zahl" id="anzahl-klassen">–</span>
+        <span class="kachel__name">Klassen</span>
+        <small>folgt im nächsten Schritt</small>
+      </button>
+      <button class="kachel" type="button" disabled>
+        <span class="kachel__zahl" id="anzahl-schueler">–</span>
+        <span class="kachel__name">Schüler:innen</span>
+        <small>folgt im nächsten Schritt</small>
+      </button>
+      <button class="kachel" type="button" disabled>
+        <span class="kachel__zahl" id="anzahl-leistungen">–</span>
+        <span class="kachel__name">Leistungen</span>
+        <small>folgt im nächsten Schritt</small>
+      </button>
+    </section>
+
+    <section class="karte" aria-labelledby="h-sicherung">
+      <h2 id="h-sicherung">Datensicherung &amp; Datenschutz</h2>
+      <p id="speicherstatus" class="leise">Wird geprüft …</p>
+      <p class="leise">
+        Backup-Dateien enthalten personenbezogene Daten. Bewahre sie nur
+        geschützt auf (z. B. verschlüsselter Datenträger) und lösche sie nach Gebrauch.
+      </p>
+      <div class="btn-gruppe">
+        <button id="btn-export" class="btn" type="button">Backup exportieren</button>
+        <button id="btn-import" class="btn btn--sekundaer" type="button">Backup importieren</button>
+        <button id="btn-loeschen" class="btn btn--gefahr" type="button">Alle Daten löschen</button>
+        <input id="datei-import" type="file" accept="application/json,.json" hidden>
+      </div>
+    </section>
+
+    <section class="karte" aria-labelledby="h-status">
+      <h2 id="h-status">Technischer Status</h2>
+      <dl class="status">
+        <dt>Letzter Start</dt>
+        <dd id="letzter-start">–</dd>
+        <dt>Datenbank-Version</dt>
+        <dd id="db-version">–</dd>
+        <dt>Offline-Nutzung</dt>
+        <dd id="offline-status">Wird eingerichtet …</dd>
+      </dl>
+      <p id="ios-hinweis" class="leise" hidden>
+        Auf dem iPhone/iPad: Teilen-Symbol → „Zum Home-Bildschirm“, um die App zu installieren.
+      </p>
+    </section>
+<section class="karte" aria-labelledby="h-klassen">
+  <h2 id="h-klassen">Klassen und Schülerlisten</h2>
+  <p id="klassen-meldung" class="meldung" role="status"
+     aria-live="polite" hidden></p>
+
+  <form id="klasse-form" class="formular">
+    <label>
+      Klassenname
+      <input name="klassenname" required maxlength="100"
+             placeholder="Zum Beispiel: BFS 1A">
+    </label>
+    <button class="btn" type="submit">Klasse anlegen</button>
+  </form>
+
+  <p id="keine-klassen" class="leise" hidden>
+    Lege zuerst eine Klasse an. Schülerlisten gehören zur Klasse.
+  </p>
+
+  <div id="klassen-inhalt" hidden>
+    <label class="formular">
+      Klasse auswählen
+      <select id="klassen-auswahl" aria-label="Klasse auswählen"></select>
+    </label>
+
+    <h3>Schüler:in hinzufügen oder bearbeiten</h3>
+    <form id="schueler-form" class="formular">
+      <input name="id" type="hidden">
+      <label>Vorname <input name="vorname" required maxlength="100"></label>
+      <label>Nachname <input name="nachname" required maxlength="100"></label>
+      <label>Telefon <input name="telefon" type="tel" autocomplete="tel"></label>
+      <label>E-Mail <input name="email" type="email" autocomplete="email"></label>
+      <label>Ausbildungsbetrieb <input name="betrieb" maxlength="150"></label>
+      <label>Ausbilder/in <input name="ausbilder" maxlength="150"></label>
+      <label>Telefon Ausbilder/in
+        <input name="ausbilderTelefon" type="tel">
+      </label>
+      <label>E-Mail Ausbilder/in
+        <input name="ausbilderEmail" type="email">
+      </label>
+      <label>Foto (optional, maximal 5 MB)
+        <input name="foto" type="file" accept="image/*">
+      </label>
+      <button id="schueler-speichern" class="btn" type="submit">
+        Schüler:in hinzufügen
+      </button>
+    </form>
+
+    <h3>Excel-Liste einfügen</h3>
+    <p class="leise">
+      In Excel Vor- und Nachnamen kopieren und hier einfügen. Nummern- und
+      Leer-Spalten werden ignoriert. Prüfe die Vorschau; die Reihenfolge
+      lässt sich pro Zeile mit „Tauschen“ ändern.
+    </p>
+    <form id="paste-form">
+      <label>
+        Kopierte Tabelle
+        <textarea name="excel-text" rows="6"
+          placeholder="Vorname&#9;Nachname"></textarea>
+      </label>
+      <button class="btn btn--sekundaer" type="submit">Vorschau erstellen</button>
+    </form>
+    <div id="import-vorschau" class="import-vorschau"></div>
+
+    <h3 id="aktuelle-klasse">Schüler:innen</h3>
+    <div id="schuelerliste"></div>
+  </div>
+</section>
+<section class="karte" aria-labelledby="h-kurse">
+  <h2 id="h-kurse">Kurse</h2>
+  <p id="kurs-meldung" class="meldung" role="status"
+     aria-live="polite" hidden></p>
+
+  <form id="kurs-neu-form" class="formular">
+    <label>
+      Schuljahr
+      <select id="kurs-neu-schuljahr" name="schuljahrId" required></select>
+    </label>
+    <label>
+      Klasse
+      <select id="kurs-neu-klasse" name="klasseId" required></select>
+    </label>
+    <label>
+      Fach
+      <input name="fach" required maxlength="100"
+             placeholder="Zum Beispiel: Mathematik">
+    </label>
+    <button class="btn" type="submit">Kurs anlegen</button>
+  </form>
+
+  <p id="kurs-neu-hinweis" class="leise" hidden>
+    Zum Anlegen eines Kurses müssen mindestens ein Schuljahr und eine Klasse
+    vorhanden sein.
+  </p>
+  <p id="kurs-alt-hinweis" class="leise" hidden></p>
+
+  <label class="kurs-auswahl-label">
+    Kurs auswählen
+    <select id="kurs-auswahl" aria-label="Kurs auswählen"></select>
+  </label>
+
+  <div id="kurs-detail" hidden></div>
+</section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

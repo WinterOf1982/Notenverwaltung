@@ -1,0 +1,456 @@
+:root {
+  --primaer: #0b5cab;
+  --hintergrund: #f4f6f9;
+  --flaeche: #ffffff;
+  --text: #1b2430;
+  --text-leise: #556070;
+  --rand: #d5dbe3;
+  --gefahr: #b3261e;
+  --erfolg: #1a7f4b;
+  --radius: 14px;
+  --tippflaeche: 48px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primaer: #2b78c9;
+    --hintergrund: #10151c;
+    --flaeche: #1a222c;
+    --text: #e8edf3;
+    --text-leise: #a3afbd;
+    --rand: #2d3846;
+    --gefahr: #f2837c;
+    --erfolg: #5cc78f;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--hintergrund);
+}
+
+:focus-visible { outline: 3px solid #f5a623; outline-offset: 2px; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0;
+  background: #fff; color: #000; padding: 12px 16px; z-index: 100;
+}
+.skip-link:focus { left: 8px; top: 8px; }
+
+/* Kopfzeile */
+.kopfzeile {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+  padding: 10px 16px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
+  background: #0b5cab; color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+}
+.kopfzeile h1 { margin: 0; font-size: 1.35rem; line-height: 1.2; }
+.kopfzeile p { margin: 0; font-size: .875rem; opacity: .9; }
+.kopfzeile__aktionen { display: flex; align-items: center; gap: 12px; }
+
+.badge {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px;
+  border-radius: 999px; font-size: .875rem; font-weight: 600;
+  background: rgba(255, 255, 255, .2); color: #fff;
+}
+.badge--offline { background: #f5a623; color: #1b2430; }
+
+/* Inhalt */
+main {
+  max-width: 900px; margin: 0 auto; padding: 16px;
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+h2 { margin: 0 0 8px; font-size: 1.25rem; }
+.leise { color: var(--text-leise); margin: 0 0 12px; }
+
+.karte {
+  background: var(--flaeche); border: 1px solid var(--rand);
+  border-radius: var(--radius); padding: 16px; margin-top: 16px;
+}
+
+/* Kacheln */
+.kacheln {
+  display: grid; gap: 12px; margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.kachel {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  min-height: 110px; padding: 16px; text-align: left; font: inherit; color: inherit;
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);
+}
+.kachel:disabled { opacity: .75; }
+.kachel__zahl { font-size: 2rem; font-weight: 700; line-height: 1.1; color: var(--primaer); }
+.kachel__name { font-weight: 600; }
+.kachel small { color: var(--text-leise); }
+
+/* Buttons */
+.btn-gruppe { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn {
+  min-height: var(--tippflaeche); padding: 0 20px;
+  font: inherit; font-weight: 600; color: #fff; background: var(--primaer);
+  border: 2px solid var(--primaer); border-radius: 12px; cursor: pointer;
+  touch-action: manipulation;
+}
+.btn:active { filter: brightness(.9); }
+.btn--sekundaer { background: transparent; color: var(--primaer); }
+.btn--gefahr { background: transparent; color: var(--gefahr); border-color: var(--gefahr); }
+.btn--hell { background: #fff; color: #0b5cab; border-color: #fff; }
+
+/* Meldungen */
+.meldung {
+  position: sticky; top: 64px; z-index: 9; margin: 12px 16px 0; padding: 12px 16px;
+  border-radius: 12px; font-weight: 600; background: var(--flaeche);
+  border: 2px solid var(--primaer); color: var(--text);
+}
+.meldung--erfolg { border-color: var(--erfolg); }
+.meldung--fehler { border-color: var(--gefahr); }
+
+/* Statusliste */
+.status { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+.status dt { color: var(--text-leise); }
+.status dd { margin: 0; font-weight: 600; }
+
+@media (min-width: 700px) {
+  main { padding: 24px; }
+}
+.formular {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.formular label,
+.kurskarte label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.formular input,
+.formular select,
+.kurskarte input {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+}
+
+.kurskarte {
+  display: grid;
+  gap: 12px;
+}
+
+.hinweis--warnung {
+  padding: 10px;
+  border-left: 4px solid #c47b00;
+  background: var(--flaeche);
+}
+.formular textarea,
+#paste-form textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+}
+
+#paste-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.personenkarte {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.personenkarte h4,
+.personenkarte p {
+  margin: 0;
+}
+
+.personenfoto {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.import-vorschau {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.import-zeile {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.import-zeile input {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+}
+
+@media (max-width: 520px) {
+  .import-zeile {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .import-zeile button {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 650px) {
+  .formular {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .formular button {
+    justify-self: start;
+  }
+.kurs-auswahl-label {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  font-weight: 600;
+}
+
+.kurs-auswahl-label select,
+#kurs-neu-form input,
+#kurs-neu-form select,
+#kurs-einstellungen-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+}
+
+.kurs-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.kurs-tabs button[aria-pressed="true"] {
+  color: #fff;
+  background: var(--primaer);
+}
+
+#kurs-detail details > summary {
+  min-height: 48px;
+  padding: 10px 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#kurs-einstellungen-form fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--rand);
+  border-radius: 12px;
+}
+
+#kurs-einstellungen-form legend {
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.gewichtung {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.unterrichtszeiten {
+  display: grid;
+  gap: 12px;
+}
+
+.unterrichtszeit {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--rand);
+  border-radius: 12px;
+}
+
+.wochentage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
+.wochentage label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+}
+#solei .solei-auswahl,
+#solei .solei-erfassung {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+#solei label {
+  display: grid;
+  gap: 6px;
+}
+
+#solei select,
+#solei input,
+#solei textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+}
+
+#solei .solei-person {
+  display: grid;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rand);
+}
+
+#solei .solei-person h4 {
+  margin: 0;
+}
+
+#solei .solei-stufen {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+#solei .solei-stufen button {
+  min-height: 52px;
+  padding: 8px 4px;
+  touch-action: manipulation;
+}
+
+#solei .solei-stufen button[aria-pressed="true"] {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+#solei details {
+  margin: 12px 0;
+}
+
+#solei summary {
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#solei .solei-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+#solei .solei-tabelle th,
+#solei .solei-tabelle td {
+  padding: 8px;
+  border-bottom: 1px solid var(--rand);
+  text-align: left;
+}
+
+@media (min-width: 760px) {
+  #solei .solei-liste {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 20px;
+  }
+}
+#notenverwaltung .noten-tabelle-box {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#notenverwaltung .noten-tabelle {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#notenverwaltung .noten-tabelle th,
+#notenverwaltung .noten-tabelle td {
+  padding: 8px;
+  border-bottom: 1px solid var(--rand);
+  text-align: left;
+}
+
+#notenverwaltung .noten-bericht-notiz {
+  min-height: 120px;
+  border: 1px solid var(--rand);
+  margin-top: 8px;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #notenverwaltung [data-report-output],
+  #notenverwaltung [data-report-output] * {
+    visibility: visible !important;
+  }
+
+  #notenverwaltung [data-report-output] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+  }
+
+  #notenverwaltung .noten-bericht-notiz {
+    min-height: 140px;
+  }
+}
+
+}
+
