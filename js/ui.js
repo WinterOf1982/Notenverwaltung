@@ -90,48 +90,90 @@ async function speicherstatusAnzeigen() {
 }
 
 function datensicherungEinrichten() {
-  $('btn-export').addEventListener('click', async () => {
+  const exportKnopf = $('btn-export');
+  const importKnopf = $('btn-import');
+  const dateiEingabe = $('datei-import');
+  const loeschKnopf = $('btn-loeschen');
+
+  exportKnopf.addEventListener('click', async () => {
+    exportKnopf.disabled = true;
+
     try {
       const paket = await exportiereAlles();
-      const blob = new Blob([JSON.stringify(paket, null, 2)], { type: 'application/json' });
+      const blob = new Blob(
+        [JSON.stringify(paket, null, 2)],
+        { type: 'application/json' }
+      );
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `notenverwaltung-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
+      link.href = url;
+      link.download =
+        `notenverwaltung-backup-${new Date().toISOString().slice(0, 10)}.json`;
+
       document.body.append(link);
       link.click();
       link.remove();
-      setTimeout(() => URL.revokeObjectURL(link.href), 1000);
-      zeigeMeldung('Backup wurde erstellt. Bitte geschützt aufbewahren.', 'erfolg');
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      zeigeMeldung(
+        'Verschlüsseltes Backup erstellt. Es ist nur mit demselben Datenschlüssel wiederherstellbar. Bitte geschützt aufbewahren.',
+        'erfolg'
+      );
     } catch (fehler) {
       zeigeMeldung(`Export fehlgeschlagen: ${fehler.message}`, 'fehler');
+    } finally {
+      exportKnopf.disabled = false;
     }
   });
 
-  $('btn-import').addEventListener('click', () => $('datei-import').click());
+  importKnopf.addEventListener('click', () => dateiEingabe.click());
 
-  $('datei-import').addEventListener('change', async (ereignis) => {
+  dateiEingabe.addEventListener('change', async (ereignis) => {
     const datei = ereignis.target.files[0];
-    ereignis.target.value = '';
+    dateiEingabe.value = '';
     if (!datei) return;
-    if (!confirm('Achtung: Der Import ersetzt ALLE aktuellen Daten auf diesem Gerät. Fortfahren?')) return;
+
+    const bestaetigt = confirm(
+      'Der Import ersetzt ALLE aktuellen Daten auf diesem Gerät. ' +
+      'Importiert werden können nur verschlüsselte Backups, die mit demselben ' +
+      'Datenschlüssel erstellt wurden. Fortfahren?'
+    );
+    if (!bestaetigt) return;
+
+    importKnopf.disabled = true;
+
     try {
       const paket = JSON.parse(await datei.text());
       await importiereAlles(paket);
       await zaehlerAktualisieren();
-      zeigeMeldung('Backup wurde importiert.', 'erfolg');
+
+      zeigeMeldung(
+        'Verschlüsseltes Backup wurde importiert.',
+        'erfolg'
+      );
     } catch (fehler) {
       zeigeMeldung(`Import fehlgeschlagen: ${fehler.message}`, 'fehler');
+    } finally {
+      importKnopf.disabled = false;
     }
   });
 
-  $('btn-loeschen').addEventListener('click', async () => {
-    if (!confirm('Wirklich ALLE Daten auf diesem Gerät unwiderruflich löschen?')) return;
+  loeschKnopf.addEventListener('click', async () => {
+    if (!confirm('Wirklich ALLE Daten auf diesem Gerät unwiderruflich löschen?')) {
+      return;
+    }
+
+    loeschKnopf.disabled = true;
+
     try {
       await alleLoeschen();
       await zaehlerAktualisieren();
       zeigeMeldung('Alle Daten wurden gelöscht.', 'erfolg');
     } catch (fehler) {
       zeigeMeldung(`Löschen fehlgeschlagen: ${fehler.message}`, 'fehler');
+    } finally {
+      loeschKnopf.disabled = false;
     }
   });
 }
